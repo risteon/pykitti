@@ -1,4 +1,6 @@
 """Provides 'odometry', which loads and parses odometry benchmark data."""
+from __future__ import print_function
+from __future__ import division
 
 import datetime as dt
 import glob
@@ -112,7 +114,7 @@ class odometry:
                     self.T_w_cam0.append(T)
             print('done.')
 
-        except FileNotFoundError:
+        except IOError:   # FileNotFoundError on Py3.3+ inherits from IOError
             print('Ground truth poses are not avaialble for sequence ' +
                   self.sequence + '.')
 
