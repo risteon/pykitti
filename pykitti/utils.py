@@ -62,29 +62,33 @@ def read_calib_file(filepath):
 
 def load_stereo_pairs(imL_files, imR_files, **kwargs):
     """Helper method to read stereo image pairs."""
-    StereoPair = namedtuple('StereoPair', 'left, right')
-
     impairs = []
     for imfiles in zip(imL_files, imR_files):
-        # Convert to uint8 and BGR for OpenCV if requested
-        imformat = kwargs.get('format', '')
-        if imformat is 'cv2':
-            imL = np.uint8(mpimg.imread(imfiles[0]) * 255)
-            imR = np.uint8(mpimg.imread(imfiles[1]) * 255)
-
-            # Convert RGB to BGR
-            if len(imL.shape) > 2:
-                imL = imL[:, :, ::-1]
-                imR = imR[:, :, ::-1]
-
-        else:
-            imL = mpimg.imread(imfiles[0])
-            imR = mpimg.imread(imfiles[1])
-
-        impairs.append(StereoPair(imL, imR))
+        impairs.append(load_stereo_pair(imfiles[0], imfiles[1], **kwargs))
 
     return impairs
 
+
+def load_stereo_pair(imL_file, imR_file, **kwargs):
+    """Helper method to read a single stereo image pair."""
+    StereoPair = namedtuple('StereoPair', 'left, right')
+
+    # Convert to uint8 and BGR for OpenCV if requested
+    imformat = kwargs.get('format', '')
+    if imformat is 'cv2':
+        imL = np.uint8(mpimg.imread(imL_file) * 255)
+        imR = np.uint8(mpimg.imread(imR_file) * 255)
+
+        # Convert RGB to BGR
+        if len(imL.shape) > 2:
+            imL = imL[:, :, ::-1]
+            imR = imR[:, :, ::-1]
+
+    else:
+        imL = mpimg.imread(imL_file)
+        imR = mpimg.imread(imR_file)
+
+    return StereoPair(imL, imR)
 
 def load_velo_scans(velo_files):
     """Helper method to parse velodyne binary files into a list of scans."""
