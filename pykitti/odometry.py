@@ -170,6 +170,23 @@ class odometry:
 
         print('done.')
 
+    def generate_rgb(self, **kwargs):
+        imL_path = os.path.join(self.sequence_path, 'image_2', '*.png')
+        imR_path = os.path.join(self.sequence_path, 'image_3', '*.png')
+
+        imL_files = sorted(glob.glob(imL_path))
+        imR_files = sorted(glob.glob(imR_path))
+
+        # Subselect the chosen range of frames, if any
+        if self.frame_range:
+            imL_files = [imL_files[i] for i in self.frame_range]
+            imR_files = [imR_files[i] for i in self.frame_range]
+
+        print('Found ' + str(len(imL_files)) + ' image pairs...')
+
+        for imfiles in zip(imL_files, imR_files):
+            yield utils.load_stereo_pair(imfiles[0], imfiles[1], **kwargs)
+
     def load_velo(self):
         """Load velodyne [x,y,z,reflectance] scan data from binary files."""
         # Find all the Velodyne files
