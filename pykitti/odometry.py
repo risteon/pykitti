@@ -6,6 +6,7 @@ import datetime as dt
 import glob
 import os
 from collections import namedtuple
+from PIL import Image
 
 import numpy as np
 
@@ -104,19 +105,14 @@ class odometry:
         pose_file = os.path.join(self.pose_path, self.sequence + '.txt')
 
         # Read and parse the poses
-        try:
-            self.T_w_cam0 = []
-            with open(pose_file, 'r') as f:
-                for line in f.readlines():
-                    T = np.fromstring(line, dtype=float, sep=' ')
-                    T = T.reshape(3, 4)
-                    T = np.vstack((T, [0, 0, 0, 1]))
-                    self.T_w_cam0.append(T)
-            print('done.')
-
-        except IOError:   # FileNotFoundError on Py3.3+ inherits from IOError
-            print('Ground truth poses are not avaialble for sequence ' +
-                  self.sequence + '.')
+        self.T_w_cam0 = []
+        with open(pose_file, 'r') as f:
+            for line in f.readlines():
+                T = np.fromstring(line, dtype=float, sep=' ')
+                T = T.reshape(3, 4)
+                T = np.vstack((T, [0, 0, 0, 1]))
+                self.T_w_cam0.append(T)
+        print('done.')
 
     def load_gray(self, **kwargs):
         """Load monochrome stereo images from file.
@@ -169,6 +165,11 @@ class odometry:
         self.rgb = utils.load_stereo_pairs(imL_files, imR_files, **kwargs)
 
         print('done.')
+
+    def read_rgb_at_position(self, position):
+        # assume this filename
+        imL_path = os.path.join(self.sequence_path, 'image_2', '{0:06d}.png'.format(position))
+        return np.array(Image.open(imL_path))
 
     def generate_rgb(self, **kwargs):
         imL_path = os.path.join(self.sequence_path, 'image_2', '*.png')
