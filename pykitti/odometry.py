@@ -166,10 +166,10 @@ class odometry:
 
         print('done.')
 
-    def read_rgb_at_position(self, position):
-        # assume this filename
-        imL_path = os.path.join(self.sequence_path, 'image_2', '{0:06d}.png'.format(position))
-        return np.array(Image.open(imL_path))
+    def read_rgb_at_position(self, position, img='left'):
+        folder = 'image_2' if img == 'left' else 'image_3'
+        img_path = os.path.join(self.sequence_path, folder, '{0:06d}.png'.format(position))
+        return np.array(Image.open(img_path))
 
     def generate_rgb(self, **kwargs):
         imL_path = os.path.join(self.sequence_path, 'image_2', '*.png')
